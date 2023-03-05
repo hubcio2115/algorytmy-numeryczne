@@ -1,0 +1,1 @@
+# Całkowanie numeryczne

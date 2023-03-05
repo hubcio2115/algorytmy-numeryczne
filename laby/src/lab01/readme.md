@@ -1,0 +1,1 @@
+# Błędy obliczeń numerycznych
