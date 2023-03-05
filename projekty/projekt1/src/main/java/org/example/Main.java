@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class Main {
-  private final int numberOfRuns = 10;
-
   public static double fac(double n) {
     if (n == 0) return 0;
 
