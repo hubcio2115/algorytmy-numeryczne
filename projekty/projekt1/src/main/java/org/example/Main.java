@@ -1,5 +1,10 @@
 package org.example;
 
+import com.opencsv.CSVWriter;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +35,7 @@ public class Main {
     double res = 1;
     int polar = -1;
 
-    for (int i = 2; i <= 10; i += 2) {
+    for (int i = 2; i <= 20; i += 2) {
       res += pow(x, i) / fac(i) * polar;
       polar *= -1;
     }
@@ -43,7 +48,7 @@ public class Main {
     List<Double> res = new ArrayList<>();
     int polar = -1;
 
-    for (int i = 2; i <= 10; i += 2) {
+    for (int i = 2; i <= 20; i += 2) {
       res.add(pow(x, i) / fac(i) * polar);
       polar *= -1;
     }
@@ -60,7 +65,7 @@ public class Main {
     double denominator = 1;
     double meter = 1;
 
-    for (int i = 2; i <= 10; i += 2) {
+    for (int i = 2; i <= 20; i += 2) {
       denominator *= pow(x, 2);
       meter *= i * (i - 1);
       double term = denominator / meter * polar;
@@ -76,15 +81,15 @@ public class Main {
   public static double power_series_cos_rev(double x) {
     List<Double> res = new ArrayList<>();
     double polar = -1;
-    double denominator = pow(x, 10);
-    double meter = fac(10);
+    double denominator = 1;
+    double meter = 1;
 
-    for (int i = 10; i > 0; i -= 2) {
+    for (int i = 2; i <= 20; i += 2) {
+      denominator *= pow(x, 2);
+      meter *= i * (i - 1);
       double term = denominator / meter * polar;
-      res.add(term);
 
-      denominator /= pow(x, 2);
-      meter /= i * (i - 1);
+      res.add(term);
       polar *= -1;
     }
 
@@ -93,13 +98,36 @@ public class Main {
     return res.stream().reduce(1.0, Double::sum);
   }
 
-  public static void main(String[] args) {
-    double point = 30 * (Math.PI / 180.0);
+  public static void main(String[] args) throws IOException {
+    try {
+      String[] headers = {"value", "math_cos", "t_cos", "t_cos_rev", "power_series_cos", "power_series_cos_rev"};
+      ArrayList<String[]> result = new ArrayList<>();
+      result.add(headers);
 
-    System.out.println("Math.cos: " + Math.cos(point));
-    System.out.println("t_cos: " + t_cos(point));
-    System.out.println("t_cos_rev: " + t_cos_rev(point));
-    System.out.println("power_series_cos: " + power_series_cos(point));
-    System.out.println("power_series_cos_rev: " + power_series_cos_rev(point));
+      for (double point = -2 * Math.PI; point <= 2 * Math.PI; point += 4 * Math.PI / 1_000_000) {
+        String[] row = {
+          Double.toString(point),
+          Double.toString(Math.cos(point)),
+          Double.toString(t_cos(point)),
+          Double.toString(t_cos_rev(point)),
+          Double.toString(power_series_cos(point)),
+          Double.toString(power_series_cos_rev(point))
+        };
+
+        result.add(row);
+      }
+
+      FileOutputStream fos = new FileOutputStream("./out.csv");
+      OutputStreamWriter osw = new OutputStreamWriter(fos);
+      CSVWriter writer = new CSVWriter(osw);
+
+      writer.writeAll(result);
+
+      writer.close();
+      osw.close();
+      fos.close();
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+    }
   }
 }
